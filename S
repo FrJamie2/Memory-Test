@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Memory Test</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0f0f0f;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 700px;
+    background: #181818;
+    padding: 40px 25px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+h1 {
+    font-size: 42px;
+    margin: 0 0 10px;
+}
+
+.subtitle {
+    color: #aaa;
+    font-size: 17px;
+    margin-bottom: 30px;
+}
+
+#level {
+    font-size: 22px;
+}
+
+#sequence {
+    font-size: 50px;
+    font-weight: bold;
+    letter-spacing: 9px;
+    min-height: 65px;
+    margin: 25px 0;
+}
+
+input {
+    width: 90%;
+    max-width: 500px;
+    padding: 15px;
+
+    background: #222;
+    color: white;
+
+    border: 1px solid #555;
+    border-radius: 8px;
+
+    font-size: 20px;
+    text-align: center;
+}
+
+button {
+    margin-top: 15px;
+    padding: 14px 28px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #ff0000;
+    color: white;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button:hover {
+    background: #cc0000;
+}
+
+.hidden {
+    display: none;
+}
+
+#message {
+    min-height: 28px;
+    margin-top: 18px;
+    font-size: 18px;
+}
+
+.challenge {
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Memory Test</h1>
+
+    <div class="subtitle">
+        How far can your memory go?
+    </div>
+
+    <div id="level">
+        Ready?
+    </div>
+
+    <div id="sequence">
+        Press Start
+    </div>
+
+    <button id="start">
+        Start Game
+    </button>
+
+    <div id="game" class="hidden">
+
+        <input
+            id="answer"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Type the sequence"
+        >
+
+        <br>
+
+        <button id="submit">
+            Submit
+        </button>
+
+    </div>
+
+    <div id="message"></div>
+
+    <div class="challenge">
+        <b>YouTube Challenge</b>
+        <br>
+        Comment the level you reached!
+    </div>
+
+</div>
+
+
+<script>
+
+const lengths = [3, 4, 5, 7, 10];
+
+const characters = "0123456789ABCDEF";
+
+let level = 0;
+let sequence = "";
+
+
+const levelText = document.getElementById("level");
+const sequenceText = document.getElementById("sequence");
+
+const startButton = document.getElementById("start");
+
+const game = document.getElementById("game");
+
+const answer = document.getElementById("answer");
+
+const submitButton = document.getElementById("submit");
+
+const message = document.getElementById("message");
+
+
+function createSequence(length) {
+
+    let result = "";
+
+    for (let i = 0; i < length; i++) {
+
+        result += characters[
+            Math.floor(Math.random() * characters.length)
+        ];
+
+    }
+
+    return result;
+}
+
+
+function startGame() {
+
+    level = 0;
+
+    message.textContent = "";
+
+    startButton.classList.add("hidden");
+
+    game.classList.add("hidden");
+
+    nextLevel();
+}
+
+
+function nextLevel() {
+
+    if (level >= 5) {
+
+        levelText.textContent = "You beat all 5 levels!";
+
+        sequenceText.textContent = "YOU WIN";
+
+        game.classList.add("hidden");
+
+        startButton.textContent = "Play Again";
+
+        startButton.classList.remove("hidden");
+
+        return;
+    }
+
+
+    const length = lengths[level];
+
+    sequence = createSequence(length);
+
+
+    levelText.textContent =
+        "Level " + (level + 1) +
+        " — " + length + " characters";
+
+
+    sequenceText.textContent = sequence;
+
+    message.textContent = "";
+
+
+    // Show the sequence for 1.8 seconds
+    setTimeout(function() {
+
+        sequenceText.textContent = "••••••";
+
+        game.classList.remove("hidden");
+
+        answer.value = "";
+
+        answer.focus();
+
+    }, 1800);
+}
+
+
+function checkAnswer() {
+
+    const playerAnswer =
+        answer.value.trim().toUpperCase();
+
+
+    if (playerAnswer === sequence) {
+
+        level++;
+
+        game.classList.add("hidden");
+
+        message.textContent = "Correct!";
+
+        setTimeout(function() {
+
+            nextLevel();
+
+        }, 700);
+
+    }
+
+    else {
+
+        sequenceText.textContent = "GAME OVER";
+
+        levelText.textContent =
+            "You reached Level " + (level + 1);
+
+        message.textContent =
+            "Incorrect. Try again!";
+
+        game.classList.add("hidden");
+
+        startButton.textContent = "Try Again";
+
+        startButton.classList.remove("hidden");
+    }
+}
+
+
+startButton.addEventListener("click", startGame);
+
+
+submitButton.addEventListener("click", checkAnswer);
+
+
+answer.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+        checkAnswer();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
